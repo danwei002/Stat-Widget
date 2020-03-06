@@ -1,2 +1,2 @@
 # Stat-Widget
-yes
+yes no no
