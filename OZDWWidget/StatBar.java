@@ -8,6 +8,7 @@ import java.lang.Math;
  */
 public class StatBar extends Actor
 {
+    private static final int baseChargeValue = 50;
     // Instance variables
     private boolean isChargeBar;
     // Array to keep track of the chargeBar states
@@ -26,8 +27,11 @@ public class StatBar extends Actor
     // Track if the ult fully charged sound has been played
     private boolean playedUltSound;
     
-    // Track if the low HP warning noie is currently playing
+    // Track if the low HP warning noise is currently playing
     private boolean playingLowHPSound;
+    
+    // Boolean to track if the ability is currently being used
+    private boolean usingAbility;
     
     // Track values
     private int currVal;
@@ -46,6 +50,7 @@ public class StatBar extends Actor
     
     // Index for chargeBar array images
     private int index = 0;
+    private int animationDelay = 0;
     
     // Sounds
     private GreenfootSound ultCharged = new GreenfootSound("UltimateCharged.mp3");
@@ -64,7 +69,7 @@ public class StatBar extends Actor
             width = 160;
             height = 160;
             currVal = 0;
-            maxVal = 50;
+            maxVal = 500;
             img = new GreenfootImage(160, 160);
             playedUltSound = false;
             
@@ -93,6 +98,50 @@ public class StatBar extends Actor
             img.setColor(filledColor);
             img.fillRect(borderWidth, borderWidth, width - 2 * borderWidth, height - 2 * borderWidth);
             setImage(img);
+           
+        }
+    }
+    
+    public StatBar(boolean isChargeBar, int width, int height, int borderWidth, int maxVal, int currVal)
+    {
+        this.isChargeBar = isChargeBar;
+        this.maxVal = maxVal;
+        this.currVal = currVal;
+        this.width = width;
+        this.borderWidth = borderWidth;
+        this.height = height;
+        img = new GreenfootImage(width, height);
+        if (currVal > maxVal) {currVal = maxVal;}
+        if (isChargeBar)
+        {
+            playedUltSound = false;
+            double increment = (double) maxVal / 43;
+            index = (int) (currVal / increment);
+            if (index == 43) {index = 42;}
+            chargeBarFrames[index].scale(width, height);
+            img.drawImage(chargeBarFrames[index], 0, 0);
+            setImage(img);
+        }
+        else
+        {
+            playingLowHPSound = false;
+            filledColor = Color.GREEN;
+            emptyColor = Color.RED;
+            borderColor = Color.BLACK;
+            
+            img.setColor(borderColor);
+            img.fillRect(0, 0, width, height);
+            
+            int filledWidth = (width - 2 * borderWidth) * currVal / maxVal;
+            int emptyWidth = (width - 2 * borderWidth) - filledWidth;
+            
+            img.setColor(filledColor);
+            img.fillRect(borderWidth, borderWidth, filledWidth, height - 2 * borderWidth);
+            
+            img.setColor(emptyColor);
+            img.fillRect(borderWidth + filledWidth, borderWidth, emptyWidth, height - 2 * borderWidth);
+
+            setImage(img);
         }
     }
     
@@ -102,33 +151,39 @@ public class StatBar extends Actor
      */
     public void act() 
     {
-        // Just some testing code
-        if (Greenfoot.getKey() == "space")
-        {
-            ultCharged.play();
-        }
         update(currVal);
-        if (Greenfoot.isKeyDown("A"))
+        if (Greenfoot.isKeyDown("Q")) {useAbility();}
+        
+        if (!usingAbility) 
         {
-            currVal--;
+            if (Greenfoot.isKeyDown("A") && currVal > 0)
+            {
+                currVal--;
+            }
+            else if (Greenfoot.isKeyDown("D") && currVal < maxVal)
+            {
+                currVal++;
+            }
+            soundCheck();
         }
-        else if (Greenfoot.isKeyDown("D"))
+        else
         {
-            currVal++;
+            currVal -= 3 * maxVal / baseChargeValue;
+            if (currVal <= 0) {usingAbility = false; currVal = 0;}
         }
-        soundCheck();
+        
     }
     
     public void update(int newVal)
     {
         if (newVal > maxVal) {newVal = maxVal;}
         if (newVal < 0) {return;}
-        
+        currVal = newVal;
         if (isChargeBar)
         {
             img.clear();
-            double increment = (double) maxVal / 42;
-            index = (int) (newVal / increment);
+            double increment = (double) maxVal / 43;
+            index = (int) (currVal / increment);
             if (index > 42) {index = 42;}
             chargeBarFrames[index].scale(width, height);
             img.drawImage(chargeBarFrames[index], 0, 0);
@@ -136,7 +191,7 @@ public class StatBar extends Actor
         }
         else 
         {
-            int filledWidth = (width - 2 * borderWidth) * newVal / maxVal;
+            int filledWidth = (width - 2 * borderWidth) * currVal / maxVal;
             int emptyWidth = (width - 2 * borderWidth) - filledWidth;
             
             img.setColor(filledColor);
@@ -180,5 +235,13 @@ public class StatBar extends Actor
                 playingLowHPSound = false;
             }
         }
+    }
+    
+    public void useAbility()
+    {
+        if (usingAbility) {return;}
+        if (currVal < maxVal) {return;}
+        if (!isChargeBar) {return;}
+        usingAbility = true;
     }
 }
