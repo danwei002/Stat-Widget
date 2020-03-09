@@ -9,10 +9,20 @@ import java.lang.Math;
 public class StatBar extends Actor
 {
     // Instance variables
-    
-    // Bar type
-    private boolean isHealthBar;
-    
+    private boolean isChargeBar;
+    // Array to keep track of the chargeBar states
+    private GreenfootImage[] chargeBarFrames = {new GreenfootImage("ultBar0.png"), new GreenfootImage("ultBar1.png"), new GreenfootImage("ultBar2.png"), new GreenfootImage("ultBar3.png"), 
+                                             new GreenfootImage("ultBar4.png"), new GreenfootImage("ultBar5.png"), new GreenfootImage("ultBar6.png"), new GreenfootImage("ultBar7.png"),
+                                             new GreenfootImage("ultBar8.png"), new GreenfootImage("ultBar9.png"), new GreenfootImage("ultBar10.png"), new GreenfootImage("ultBar11.png"), 
+                                             new GreenfootImage("ultBar12.png"), new GreenfootImage("ultBar13.png"), new GreenfootImage("ultBar14.png"), new GreenfootImage("ultBar15.png"),  
+                                             new GreenfootImage("ultBar16.png"), new GreenfootImage("ultBar17.png"), new GreenfootImage("ultBar18.png"), new GreenfootImage("ultBar19.png"), 
+                                             new GreenfootImage("ultBar20.png"), new GreenfootImage("ultBar21.png"), new GreenfootImage("ultBar22.png"), new GreenfootImage("ultBar23.png"),
+                                             new GreenfootImage("ultBar24.png"), new GreenfootImage("ultBar25.png"), new GreenfootImage("ultBar26.png"), new GreenfootImage("ultBar27.png"), 
+                                             new GreenfootImage("ultBar28.png"), new GreenfootImage("ultBar29.png"), new GreenfootImage("ultBar30.png"), new GreenfootImage("ultBar31.png"),
+                                             new GreenfootImage("ultBar32.png"), new GreenfootImage("ultBar33.png"), new GreenfootImage("ultBar34.png"), new GreenfootImage("ultBar35.png"), 
+                                             new GreenfootImage("ultBar36.png"), new GreenfootImage("ultBar37.png"), new GreenfootImage("ultBar38.png"), new GreenfootImage("ultBar39.png"), 
+                                             new GreenfootImage("ultBar40.png"), new GreenfootImage("ultBar41.png"), new GreenfootImage("ultBar42.png")};
+
     // Track if the ult fully charged sound has been played
     private boolean playedUltSound;
     
@@ -22,6 +32,7 @@ public class StatBar extends Actor
     // Track values
     private int currVal;
     private int maxVal;
+
     
     // Bar colors
     private Color filledColor;
@@ -33,6 +44,9 @@ public class StatBar extends Actor
     private int height;
     private int borderWidth;
     
+    // Index for chargeBar array images
+    private int index = 0;
+    
     // Sounds
     private GreenfootSound ultCharged = new GreenfootSound("UltimateCharged.mp3");
     
@@ -42,95 +56,50 @@ public class StatBar extends Actor
     // Canvas
     private GreenfootImage img;
     
-    public StatBar(boolean barType)
+    public StatBar(boolean isChargeBar)
     {
-        // Default width and height
-        width = 300;
-        height = 50;
-        borderWidth = 5;
-        
-        // Set the maximum value for the bar
-        maxVal = 100;
-        
-        playedUltSound = false;
-        playingLowHPSound = false;
-        
-        // Image to draw on
-        img = new GreenfootImage(width, height);
-        
-        // Either a health/shield/hitpoint bar or a "charge" bar (tracks ability charge/progression)
-        isHealthBar = barType;
-        
-        // Creating the border
-        borderColor = Color.DARK_GRAY;
-        img.setColor(borderColor);
-        img.fillRect(0, 0, width, height);
-        
-        // Depending on the bar type, create the bar using a set color
-        if (isHealthBar)
+        this.isChargeBar = isChargeBar; 
+        if (isChargeBar)
         {
+            width = 160;
+            height = 160;
+            currVal = 0;
+            maxVal = 50;
+            img = new GreenfootImage(160, 160);
+            playedUltSound = false;
+            
+            chargeBarFrames[0].scale(160, 160);
+            img.drawImage(chargeBarFrames[0], 0, 0);
+            
+            setImage(img);
+        }
+        else 
+        {
+            width = 400;
+            height = 50;
+            borderWidth = 10;
+            currVal = 50;
+            maxVal = 100;
+            playingLowHPSound = false;
+            
+            img = new GreenfootImage(width, height);
             filledColor = Color.GREEN;
             emptyColor = Color.RED;
+            borderColor = Color.BLACK;
+            
+            img.setColor(Color.BLACK);
+            img.fillRect(0, 0, width, height);
+            
             img.setColor(filledColor);
-            img.fillRect(borderWidth, borderWidth, width - borderWidth * 2, height - borderWidth  * 2);
+            img.fillRect(borderWidth, borderWidth, width - 2 * borderWidth, height - 2 * borderWidth);
+            setImage(img);
         }
-        else
-        {
-            filledColor = Color.ORANGE;
-            emptyColor = Color.BLACK;
-            img.setColor(emptyColor);
-            img.fillRect(borderWidth, borderWidth, width - borderWidth * 2, height - borderWidth  * 2);
-        }
-        
-        setImage(img);
     }
     
-    public StatBar(boolean barType, int width, int height, int borderWidth)
-    {
-        // Setting dimensions & bar type
-        this.width = width;
-        this.height = height;
-        isHealthBar = barType;
-        this.borderWidth = borderWidth;
-        
-        playedUltSound = false;
-        playingLowHPSound = false;
-        
-        // Set the maximum value for the bar
-        maxVal = 100;
-        
-        // Image to draw on
-        img = new GreenfootImage(width, height);
-        
-        // Creating the border
-        borderColor = Color.DARK_GRAY;
-        img.setColor(borderColor);
-        img.fillRect(0, 0, width, height);
-        
-        // Depending on the bar type, create the bar using a set color
-        if (isHealthBar)
-        {
-            filledColor = Color.GREEN;
-            emptyColor = Color.RED;
-            img.setColor(filledColor);
-            img.fillRect(borderWidth, borderWidth, width - borderWidth * 2, height - borderWidth  * 2);
-        }
-        else
-        {
-            filledColor = Color.ORANGE;
-            emptyColor = Color.BLACK;
-            img.setColor(emptyColor);
-            img.fillRect(borderWidth, borderWidth, width - borderWidth * 2, height - borderWidth  * 2);
-        }
-        
-        setImage(img);
-    }
-
     /**
      * Act - do whatever the StatBar wants to do. This method is called whenever
      * the 'Act' or 'Run' button gets pressed in the environment.
      */
-    private int test = 30;
     public void act() 
     {
         // Just some testing code
@@ -138,70 +107,78 @@ public class StatBar extends Actor
         {
             ultCharged.play();
         }
-        update(test);
+        update(currVal);
         if (Greenfoot.isKeyDown("A"))
         {
-            test--;
+            currVal--;
         }
         else if (Greenfoot.isKeyDown("D"))
         {
-            test++;
+            currVal++;
+        }
+        soundCheck();
+    }
+    
+    public void update(int newVal)
+    {
+        if (newVal > maxVal) {newVal = maxVal;}
+        if (newVal < 0) {return;}
+        
+        if (isChargeBar)
+        {
+            img.clear();
+            double increment = (double) maxVal / 42;
+            index = (int) (newVal / increment);
+            if (index > 42) {index = 42;}
+            chargeBarFrames[index].scale(width, height);
+            img.drawImage(chargeBarFrames[index], 0, 0);
+            setImage(img);
+        }
+        else 
+        {
+            int filledWidth = (width - 2 * borderWidth) * newVal / maxVal;
+            int emptyWidth = (width - 2 * borderWidth) - filledWidth;
+            
+            img.setColor(filledColor);
+            img.fillRect(borderWidth, borderWidth, filledWidth, height - 2 * borderWidth);
+            
+            img.setColor(emptyColor);
+            img.fillRect(borderWidth + filledWidth, borderWidth, emptyWidth, height - 2 * borderWidth);
+
+            setImage(img);
         }
     }
     
-    public void update(int newValue)
+    private void soundCheck()
     {
-        // Can't have a negative amount of charge/health
-        if (newValue < 0) {return;}
-        
-        
-        if (isHealthBar) // Sound playing if statement for healthbars
+        if (isChargeBar)
         {
-            if (!playingLowHPSound && newValue * 10 <= maxVal * 3) // If the updated value is less than 30% of the maximum, and the sound was not previously playing, play the sound
+            if (currVal == maxVal)
             {
-                lowHPSound.playLoop();
-                playingLowHPSound = true;
-            }
-            else
-            {
-                if (newValue * 10 > maxVal * 3) // Once the updated value exceeds 30% of the maximum, no longer critical health, stop the sound
-                {
-                    playingLowHPSound = false;
-                    lowHPSound.stop();
-                }
-            }
-        }
-        else // Sound playing if statement for charge bars
-        {
-            if (newValue == maxVal && !playedUltSound) 
-            {
+                if (playedUltSound) {return;}
                 ultCharged.play();
                 playedUltSound = true;
             }
-            else
+            else if (currVal < maxVal)
             {
-                // Reset the sound tracking boolean
-                if (newValue < maxVal)
-                {
-                    playedUltSound = false;
-                }
-            }
-            
-            // Can't exceed the max value
-            if (newValue > maxVal) 
-            {
-                newValue = maxVal;
+                playedUltSound = false;
             }
         }
-        
-        
-        int filledWidth = (width - borderWidth * 2 ) * newValue / maxVal;
-        int emptyWidth = (width - borderWidth * 2) - filledWidth;
-
-        img.setColor(filledColor);
-        img.fillRect(borderWidth, borderWidth, filledWidth, height - borderWidth * 2);
-        img.setColor(emptyColor);
-        img.fillRect(borderWidth + filledWidth, borderWidth, emptyWidth, height - borderWidth * 2);
-        setImage(img);
+        else
+        {
+            if (currVal * 10 <= maxVal * 3)
+            {
+                if (!playingLowHPSound)
+                {
+                    lowHPSound.playLoop();
+                    playingLowHPSound = true;
+                }
+            }
+            else 
+            {
+                lowHPSound.stop();
+                playingLowHPSound = false;
+            }
+        }
     }
 }
