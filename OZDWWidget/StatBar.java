@@ -162,9 +162,21 @@ public class StatBar extends Actor
         }
     }
     
-    public StatBar(boolean isChargeBar, int width, int height, int borderWidth, int maxVal, int currVal, Color filledColor, Color emptyColor, Color borderColor)
+    /**
+     * Creates a rectangular health bar (one of the two types of StatBars).
+     * 
+     * @param width Width of the StatBar
+     * @param height Height of the StatBar
+     * @param borderWidth Width of the border of the StatBar. 
+     * @param maxVal Maximum possible value of the StatBar.
+     * @param currVal Current value of the StatBar.
+     * @param filledColor Colour of the filled up portion of a rectangular health bar.
+     * @param emptyColor Colour of the empty portion of a rectangular health bar.
+     * @param borderColor Colour of the border of a rectangular health bar.
+     */
+    public StatBar(int width, int height, int borderWidth, int maxVal, int currVal, Color filledColor, Color emptyColor, Color borderColor)
     {
-        this.isChargeBar = isChargeBar;
+        isChargeBar = false;
         this.maxVal = maxVal;
         this.currVal = currVal;
         this.width = width;
@@ -218,6 +230,7 @@ public class StatBar extends Actor
     {
         update(currVal);
         if (Greenfoot.isKeyDown("Q")) {useAbility();}
+        if (Greenfoot.isKeyDown("E")) {update(100, 500);}
         
         if (!usingAbility) 
         {
@@ -240,7 +253,9 @@ public class StatBar extends Actor
     }
     
     /**
-     * Update
+     * Updates the StatBar's current value with a new value. Also updates the appearance of the StatBar accordingly.
+     * 
+     * @param newVal New value to update the StatBar with.
      */
     public void update(int newVal)
     {
@@ -272,6 +287,47 @@ public class StatBar extends Actor
         }
     }
     
+    /**
+     * Updates the StatBar's current value and current maximum value with new values. Also updates the appearance of the StatBar accordingly.
+     * 
+     * @param newVal New value to update the StatBar with.
+     * @param newMax New maximum value to update the StatBar with.
+     */
+    public void update(int newVal, int newMax)
+    {
+        if (newVal < 0 || newMax < 0) {return;}
+        maxVal = newMax;
+        if (newVal > maxVal) {newVal = maxVal;}
+        currVal = newVal;
+        if (isChargeBar)
+        {
+            img.clear();
+            double increment = (double) maxVal / 43;
+            index = (int) (currVal / increment);
+            if (index > 42) {index = 42;}
+            chargeBarFrames[index].scale(width, height);
+            img.drawImage(chargeBarFrames[index], 0, 0);
+            setImage(img);
+        }
+        else
+        {
+            int filledWidth = (width - 2 * borderWidth) * currVal / maxVal;
+            int emptyWidth = (width - 2 * borderWidth) - filledWidth;
+            
+            img.setColor(filledColor);
+            img.fillRect(borderWidth, borderWidth, filledWidth, height - 2 * borderWidth);
+            
+            img.setColor(emptyColor);
+            img.fillRect(borderWidth + filledWidth, borderWidth, emptyWidth, height - 2 * borderWidth);
+
+            setImage(img);
+        }
+    }
+    
+    /**
+     * Checks to see if any sounds currently are playing
+     * or need to be playing/played.
+     */
     private void soundCheck()
     {
         if (isChargeBar)
@@ -305,6 +361,12 @@ public class StatBar extends Actor
         }
     }
     
+    /**
+     * Tells circular ability charge bars that the ability has been used
+     * (essentially flags an ability as used and resets its charge).
+     * Only allows the ability to be used when the current charge is equal
+     * to the bar's maximum charge value. 
+     */
     public void useAbility()
     {
         if (usingAbility) {return;}
