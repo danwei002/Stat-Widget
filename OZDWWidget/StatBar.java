@@ -1,7 +1,7 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 import java.lang.Math;
 /**
- * Write a description of class StatBar here.
+ * DESC
  * 
  * @author (your name) 
  * @version (a version number or a date)
@@ -61,6 +61,12 @@ public class StatBar extends Actor
     // Canvas
     private GreenfootImage img;
     
+    /**
+     * Creates a generic StatBar, which can either be a rectangular health bar or a circular ability charge bar.
+     * It has a set maximum and set current value.
+     *
+     * @param isChargeBar True if an ability charge bar is wanted, false otherwise.
+     */
     public StatBar(boolean isChargeBar)
     {
         this.isChargeBar = isChargeBar; 
@@ -102,6 +108,17 @@ public class StatBar extends Actor
         }
     }
     
+    /**
+     * Creates a StatBar, which is either a rectangular health bar or a circular ability charge bar, 
+     * of the specified width and height, and with a specified maximum and current value.
+     * 
+     * @param isChargeBar True for ability charge bar, false otherwise
+     * @param width Width of the StatBar
+     * @param height Height of the StatBar
+     * @param borderWidth Width of the border of the StatBar. Only applies to rectangular health bars and is ignored by circular ability charge bars.
+     * @param maxVal Maximum possible value of the StatBar.
+     * @param currVal Current value of the StatBar.
+     */
     public StatBar(boolean isChargeBar, int width, int height, int borderWidth, int maxVal, int currVal)
     {
         this.isChargeBar = isChargeBar;
@@ -222,6 +239,9 @@ public class StatBar extends Actor
         
     }
     
+    /**
+     * Update
+     */
     public void update(int newVal)
     {
         if (newVal > maxVal) {newVal = maxVal;}

@@ -1,10 +1,12 @@
 #BlueJ class context
 comment0.target=StatBar
-comment0.text=\r\n\ Write\ a\ description\ of\ class\ StatBar\ here.\r\n\ \r\n\ @author\ (your\ name)\ \r\n\ @version\ (a\ version\ number\ or\ a\ date)\r\n
+comment0.text=\r\n\ DESC\r\n\ \r\n\ @author\ (your\ name)\ \r\n\ @version\ (a\ version\ number\ or\ a\ date)\r\n
 comment1.params=isChargeBar
 comment1.target=StatBar(boolean)
+comment1.text=\r\n\ Creates\ a\ generic\ StatBar,\ which\ can\ either\ be\ a\ rectangular\ health\ bar\ or\ a\ circular\ ability\ charge\ bar.\r\n\ It\ has\ a\ set\ maximum\ and\ set\ current\ value.\r\n\r\n\ @param\ isChargeBar\ True\ if\ an\ ability\ charge\ bar\ is\ wanted,\ false\ otherwise.\r\n
 comment2.params=isChargeBar\ width\ height\ borderWidth\ maxVal\ currVal
 comment2.target=StatBar(boolean,\ int,\ int,\ int,\ int,\ int)
+comment2.text=\r\n\ Creates\ a\ StatBar,\ which\ is\ either\ a\ rectangular\ health\ bar\ or\ a\ circular\ ability\ charge\ bar,\ \r\n\ of\ the\ specified\ width\ and\ height,\ and\ with\ a\ specified\ maximum\ and\ current\ value.\r\n\ \r\n\ @param\ isChargeBar\ True\ for\ ability\ charge\ bar,\ false\ otherwise\r\n\ @param\ width\ Width\ of\ the\ StatBar\r\n\ @param\ height\ Height\ of\ the\ StatBar\r\n\ @param\ borderWidth\ Width\ of\ the\ border\ of\ the\ StatBar.\ Only\ applies\ to\ rectangular\ health\ bars\ and\ is\ ignored\ by\ circular\ ability\ charge\ bars.\r\n\ @param\ maxVal\ Maximum\ possible\ value\ of\ the\ StatBar.\r\n\ \r\n
 comment3.params=isChargeBar\ width\ height\ borderWidth\ maxVal\ currVal\ filledColor\ emptyColor\ borderColor
 comment3.target=StatBar(boolean,\ int,\ int,\ int,\ int,\ int,\ greenfoot.Color,\ greenfoot.Color,\ greenfoot.Color)
 comment4.params=
@@ -12,6 +14,7 @@ comment4.target=void\ act()
 comment4.text=\r\n\ Act\ -\ do\ whatever\ the\ StatBar\ wants\ to\ do.\ This\ method\ is\ called\ whenever\r\n\ the\ 'Act'\ or\ 'Run'\ button\ gets\ pressed\ in\ the\ environment.\r\n
 comment5.params=newVal
 comment5.target=void\ update(int)
+comment5.text=\r\n\ Update\r\n
 comment6.params=
 comment6.target=void\ soundCheck()
 comment7.params=
