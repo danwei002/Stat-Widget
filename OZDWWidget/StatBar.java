@@ -145,6 +145,54 @@ public class StatBar extends Actor
         }
     }
     
+    public StatBar(boolean isChargeBar, int width, int height, int borderWidth, int maxVal, int currVal, Color filledColor, Color emptyColor, Color borderColor)
+    {
+        this.isChargeBar = isChargeBar;
+        this.maxVal = maxVal;
+        this.currVal = currVal;
+        this.width = width;
+        this.borderWidth = borderWidth;
+        this.height = height;
+        this.filledColor = filledColor;
+        this.emptyColor = emptyColor;
+        this.borderColor = borderColor;
+        
+        img = new GreenfootImage(width, height);
+        if (currVal > maxVal) {currVal = maxVal;}
+        
+        if (isChargeBar)
+        {
+            playedUltSound = false;
+            double increment = (double) maxVal / 43;
+            index = (int) (currVal / increment);
+            if (index == 43) {index = 42;}
+            chargeBarFrames[index].scale(width, height);
+            img.drawImage(chargeBarFrames[index], 0, 0);
+            setImage(img);
+        }
+        else
+        {
+            playingLowHPSound = false;
+            filledColor = Color.GREEN;
+            emptyColor = Color.RED;
+            borderColor = Color.BLACK;
+            
+            img.setColor(borderColor);
+            img.fillRect(0, 0, width, height);
+            
+            int filledWidth = (width - 2 * borderWidth) * currVal / maxVal;
+            int emptyWidth = (width - 2 * borderWidth) - filledWidth;
+            
+            img.setColor(filledColor);
+            img.fillRect(borderWidth, borderWidth, filledWidth, height - 2 * borderWidth);
+            
+            img.setColor(emptyColor);
+            img.fillRect(borderWidth + filledWidth, borderWidth, emptyWidth, height - 2 * borderWidth);
+
+            setImage(img);
+        }
+    }
+    
     /**
      * Act - do whatever the StatBar wants to do. This method is called whenever
      * the 'Act' or 'Run' button gets pressed in the environment.
