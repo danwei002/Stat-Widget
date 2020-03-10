@@ -9,8 +9,12 @@ import java.lang.Math;
 public class StatBar extends Actor
 {
     private static final int baseChargeValue = 50;
+    private static final int baseHealthValue = 100;
     // Instance variables
     private boolean isChargeBar;
+
+    
+
     // Array to keep track of the chargeBar states
     private GreenfootImage[] chargeBarFrames = {new GreenfootImage("ultBar0.png"), new GreenfootImage("ultBar1.png"), new GreenfootImage("ultBar2.png"), new GreenfootImage("ultBar3.png"), 
                                              new GreenfootImage("ultBar4.png"), new GreenfootImage("ultBar5.png"), new GreenfootImage("ultBar6.png"), new GreenfootImage("ultBar7.png"),
@@ -36,12 +40,14 @@ public class StatBar extends Actor
     // Track values
     private int currVal;
     private int maxVal;
-
+    private int updtVal;
     
     // Bar colors
     private Color filledColor;
     private Color emptyColor;
     private Color borderColor;
+    private Color updateUpColor;
+    private Color updateDownColor;
     
     // Bar dimensions
     private int width;
@@ -95,8 +101,10 @@ public class StatBar extends Actor
             
             img = new GreenfootImage(width, height);
             filledColor = Color.GREEN;
-            emptyColor = Color.RED;
+            emptyColor = Color.BLACK;
             borderColor = Color.BLACK;
+            updateDownColor = Color.RED;
+            updateUpColor = new Color(200, 255, 200);
             
             img.setColor(Color.BLACK);
             img.fillRect(0, 0, width, height);
@@ -128,7 +136,7 @@ public class StatBar extends Actor
         this.borderWidth = borderWidth;
         this.height = height;
         img = new GreenfootImage(width, height);
-        if (currVal > maxVal) {currVal = maxVal;}
+        if (currVal > maxVal) {this.currVal = maxVal;}
         if (isChargeBar)
         {
             playedUltSound = false;
@@ -143,8 +151,10 @@ public class StatBar extends Actor
         {
             playingLowHPSound = false;
             filledColor = Color.GREEN;
-            emptyColor = Color.RED;
+            emptyColor = Color.BLACK;
             borderColor = Color.BLACK;
+            updateDownColor = Color.RED;
+            updateUpColor = new Color(200, 255, 200);
             
             img.setColor(borderColor);
             img.fillRect(0, 0, width, height);
@@ -173,8 +183,10 @@ public class StatBar extends Actor
      * @param filledColor Colour of the filled up portion of a rectangular health bar.
      * @param emptyColor Colour of the empty portion of a rectangular health bar.
      * @param borderColor Colour of the border of a rectangular health bar.
+     * @param updateDownColor Colour of the animation for health loss.
+     * @param udateUpColor Colour of the animation for health gain.
      */
-    public StatBar(int width, int height, int borderWidth, int maxVal, int currVal, Color filledColor, Color emptyColor, Color borderColor)
+    public StatBar(int width, int height, int borderWidth, int maxVal, int currVal, Color filledColor, Color emptyColor, Color borderColor, Color updateDownColor, Color updateUpColor)
     {
         isChargeBar = false;
         this.maxVal = maxVal;
@@ -185,6 +197,8 @@ public class StatBar extends Actor
         this.filledColor = filledColor;
         this.emptyColor = emptyColor;
         this.borderColor = borderColor;
+        this.updateDownColor = updateDownColor;
+        this.updateUpColor = updateUpColor;
         
         img = new GreenfootImage(width, height);
         if (currVal > maxVal) {currVal = maxVal;}
@@ -230,7 +244,8 @@ public class StatBar extends Actor
     {
         update(currVal);
         if (Greenfoot.isKeyDown("Q")) {useAbility();}
-        if (Greenfoot.isKeyDown("E")) {update(100, 100);}
+        if (Greenfoot.isKeyDown("E")) {update(maxVal / 2);}
+        if (Greenfoot.isKeyDown("R")) {update(400, 500);}
         
         if (!usingAbility) 
         {
@@ -242,7 +257,7 @@ public class StatBar extends Actor
             {
                 currVal++;
             }
-            soundCheck();
+            
         }
         else
         {
@@ -250,6 +265,22 @@ public class StatBar extends Actor
             if (currVal <= 0) {usingAbility = false; currVal = 0;}
         }
         
+        // keep
+        soundCheck();
+        if (currVal < updtVal)
+        {
+            updtVal -= (int) ((double) maxVal / baseHealthValue + 0.5);
+        }
+        else if (currVal > updtVal)
+        {
+            updtVal += (int) ((double) maxVal / baseHealthValue + 0.5);
+        }
+        
+        if (Math.abs(updtVal - currVal) < (int) ((double) maxVal / baseHealthValue + 0.5))
+        {
+            currVal = updtVal;
+        }
+
     }
     
     /**
@@ -274,15 +305,31 @@ public class StatBar extends Actor
         }
         else 
         {
-            int filledWidth = (width - 2 * borderWidth) * currVal / maxVal;
-            int emptyWidth = (width - 2 * borderWidth) - filledWidth;
-            
-            img.setColor(filledColor);
-            img.fillRect(borderWidth, borderWidth, filledWidth, height - 2 * borderWidth);
-            
-            img.setColor(emptyColor);
-            img.fillRect(borderWidth + filledWidth, borderWidth, emptyWidth, height - 2 * borderWidth);
-
+            int filledWidth = (width - 2 * borderWidth) * newVal / maxVal;
+            int updatingWidth = (width - 2 * borderWidth) * updtVal / maxVal;
+            int emptyWidth = (width - 2 * borderWidth) - updatingWidth;
+            if(newVal < updtVal)
+            {
+                img.setColor(updateDownColor);
+                img.fillRect(borderWidth, borderWidth, updatingWidth, height - 2 * borderWidth);
+                
+                img.setColor(filledColor);
+                img.fillRect(borderWidth, borderWidth, filledWidth, height - 2 * borderWidth);
+                
+                img.setColor(emptyColor);
+                img.fillRect(borderWidth + updatingWidth, borderWidth, emptyWidth, height - 2 * borderWidth);
+            }
+            else
+            {
+                img.setColor(updateUpColor);
+                img.fillRect(borderWidth, borderWidth, filledWidth, height - 2 * borderWidth);
+                
+                img.setColor(filledColor);
+                img.fillRect(borderWidth, borderWidth, updatingWidth, height - 2 * borderWidth);
+                
+                img.setColor(emptyColor);
+                img.fillRect(borderWidth + updatingWidth, borderWidth, emptyWidth, height - 2 * borderWidth);
+            }
             setImage(img);
         }
     }
@@ -311,16 +358,34 @@ public class StatBar extends Actor
         }
         else
         {
-            int filledWidth = (width - 2 * borderWidth) * currVal / maxVal;
-            int emptyWidth = (width - 2 * borderWidth) - filledWidth;
+            int filledWidth = (width - 2 * borderWidth) * newVal / maxVal;
+            int updatingWidth = (width - 2 * borderWidth) * updtVal / maxVal;
+            int emptyWidth = (width - 2 * borderWidth) - updatingWidth;
+            if(newVal < updtVal)
+            {
+                img.setColor(updateDownColor);
+                img.fillRect(borderWidth, borderWidth, updatingWidth, height - 2 * borderWidth);
+                
+                img.setColor(filledColor);
+                img.fillRect(borderWidth, borderWidth, filledWidth, height - 2 * borderWidth);
+                
+                img.setColor(emptyColor);
+                img.fillRect(borderWidth + updatingWidth, borderWidth, emptyWidth, height - 2 * borderWidth);
+            }
+            else
+            {
+                img.setColor(updateUpColor);
+                img.fillRect(borderWidth, borderWidth, filledWidth, height - 2 * borderWidth);
+                
+                img.setColor(filledColor);
+                img.fillRect(borderWidth, borderWidth, updatingWidth, height - 2 * borderWidth);
+                
+                img.setColor(emptyColor);
+                img.fillRect(borderWidth + filledWidth, borderWidth, emptyWidth, height - 2 * borderWidth);
+            }
             
-            img.setColor(filledColor);
-            img.fillRect(borderWidth, borderWidth, filledWidth, height - 2 * borderWidth);
-            
-            img.setColor(emptyColor);
-            img.fillRect(borderWidth + filledWidth, borderWidth, emptyWidth, height - 2 * borderWidth);
-
             setImage(img);
+
         }
     }
     
