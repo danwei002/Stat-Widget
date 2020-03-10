@@ -230,7 +230,7 @@ public class StatBar extends Actor
     {
         update(currVal);
         if (Greenfoot.isKeyDown("Q")) {useAbility();}
-        if (Greenfoot.isKeyDown("E")) {update(100, 500);}
+        if (Greenfoot.isKeyDown("E")) {update(100, 100);}
         
         if (!usingAbility) 
         {
