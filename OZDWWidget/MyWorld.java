@@ -17,7 +17,7 @@ public class MyWorld extends World
     {    
         // Create a new world with 600x400 cells with a cell size of 1x1 pixels.
         super(1200, 800, 1); 
-        StatBar stat = new StatBar(true, 160, 160, 5, 50, 30);
+        StatBar stat = new StatBar(true, 80, 80, 5, 50, 30);
         StatBar stat2 = new StatBar(false);
         addObject(stat, getWidth()/2, getHeight()/2);
         addObject(stat2, getWidth()/4 * 3, getHeight()/2);

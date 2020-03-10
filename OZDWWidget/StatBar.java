@@ -14,7 +14,7 @@ public class StatBar extends Actor
     private boolean isChargeBar;
     
     // Array to keep track of the glowing animation frames
-    private GreenfootImage[] glowFrames = {new GreenfootImage("glow1.gif"), new GreenfootImage("glow2.gif"), new GreenfootImage("glow3.gif"),
+    private GreenfootImage[] glowFrames = {new GreenfootImage("glow0.gif"), new GreenfootImage("glow1.gif"), new GreenfootImage("glow2.gif"), new GreenfootImage("glow3.gif"),
                                             new GreenfootImage("glow4.gif"), new GreenfootImage("glow5.gif"), new GreenfootImage("glow6.gif"), new GreenfootImage("glow7.gif"),
                                             new GreenfootImage("glow8.gif"), new GreenfootImage("glow9.gif"), new GreenfootImage("glow10.gif"), new GreenfootImage("glow11.gif"),
                                             new GreenfootImage("glow12.gif"), new GreenfootImage("glow13.gif"), new GreenfootImage("glow14.gif"), new GreenfootImage("glow15.gif"), 
@@ -48,8 +48,7 @@ public class StatBar extends Actor
                                              new GreenfootImage("ultBar24.png"), new GreenfootImage("ultBar25.png"), new GreenfootImage("ultBar26.png"), new GreenfootImage("ultBar27.png"), 
                                              new GreenfootImage("ultBar28.png"), new GreenfootImage("ultBar29.png"), new GreenfootImage("ultBar30.png"), new GreenfootImage("ultBar31.png"),
                                              new GreenfootImage("ultBar32.png"), new GreenfootImage("ultBar33.png"), new GreenfootImage("ultBar34.png"), new GreenfootImage("ultBar35.png"), 
-                                             new GreenfootImage("ultBar36.png"), new GreenfootImage("ultBar37.png"), new GreenfootImage("ultBar38.png"), new GreenfootImage("ultBar39.png"), 
-                                             new GreenfootImage("ultBar40.png"), new GreenfootImage("ultBar41.png"), new GreenfootImage("ultBar42.png")};
+                                             new GreenfootImage("ultBar36.png")};
 
     // Track if the ult fully charged sound has been played
     private boolean playedUltSound;
@@ -59,6 +58,9 @@ public class StatBar extends Actor
     
     // Boolean to track if the ability is currently being used
     private boolean usingAbility;
+    
+    // Check if the ability bar is glowing
+    private boolean isGlowing;
     
     // Track values
     private int currVal;
@@ -163,10 +165,11 @@ public class StatBar extends Actor
         if (currVal > maxVal) {this.currVal = maxVal;}
         if (isChargeBar)
         {
+            
             playedUltSound = false;
-            double increment = (double) maxVal / 43;
+            double increment = (double) maxVal / 37;
             index = (int) (currVal / increment);
-            if (index == 43) {index = 42;}
+            if (index == 37) {index = 36;}
             chargeBarFrames[index].scale(width, height);
             img.drawImage(chargeBarFrames[index], 0, 0);
             setImage(img);
@@ -227,37 +230,25 @@ public class StatBar extends Actor
         img = new GreenfootImage(width, height);
         if (currVal > maxVal) {currVal = maxVal;}
         
-        if (isChargeBar)
-        {
-            playedUltSound = false;
-            double increment = (double) maxVal / 43;
-            index = (int) (currVal / increment);
-            if (index == 43) {index = 42;}
-            chargeBarFrames[index].scale(width, height);
-            img.drawImage(chargeBarFrames[index], 0, 0);
-            setImage(img);
-        }
-        else
-        {
-            playingLowHPSound = false;
-            filledColor = Color.GREEN;
-            emptyColor = Color.RED;
-            borderColor = Color.BLACK;
-            
-            img.setColor(borderColor);
-            img.fillRect(0, 0, width, height);
-            
-            int filledWidth = (width - 2 * borderWidth) * currVal / maxVal;
-            int emptyWidth = (width - 2 * borderWidth) - filledWidth;
-            
-            img.setColor(filledColor);
-            img.fillRect(borderWidth, borderWidth, filledWidth, height - 2 * borderWidth);
-            
-            img.setColor(emptyColor);
-            img.fillRect(borderWidth + filledWidth, borderWidth, emptyWidth, height - 2 * borderWidth);
+        playingLowHPSound = false;
+        filledColor = Color.GREEN;
+        emptyColor = Color.RED;
+        borderColor = Color.BLACK;
+        
+        img.setColor(borderColor);
+        img.fillRect(0, 0, width, height);
+        
+        int filledWidth = (width - 2 * borderWidth) * currVal / maxVal;
+        int emptyWidth = (width - 2 * borderWidth) - filledWidth;
+        
+        img.setColor(filledColor);
+        img.fillRect(borderWidth, borderWidth, filledWidth, height - 2 * borderWidth);
+        
+        img.setColor(emptyColor);
+        img.fillRect(borderWidth + filledWidth, borderWidth, emptyWidth, height - 2 * borderWidth);
 
-            setImage(img);
-        }
+        setImage(img);
+
     }
     
     /**
@@ -269,7 +260,7 @@ public class StatBar extends Actor
         update(currVal);
         if (Greenfoot.isKeyDown("Q")) {useAbility();}
         if (Greenfoot.isKeyDown("E")) {update(maxVal / 2);}
-        if (Greenfoot.isKeyDown("R")) {update(400, 500);}
+        if (Greenfoot.isKeyDown("R")) {update(maxVal);}
         
         if (!usingAbility) 
         {
@@ -285,7 +276,7 @@ public class StatBar extends Actor
         }
         else
         {
-            currVal -= 3 * maxVal / baseChargeValue;
+            currVal -= 2 * maxVal / baseChargeValue;
             if (currVal <= 0) {usingAbility = false; currVal = 0;}
         }
         
@@ -304,7 +295,6 @@ public class StatBar extends Actor
         {
             currVal = updtVal;
         }
-
     }
     
     /**
@@ -320,9 +310,9 @@ public class StatBar extends Actor
         if (isChargeBar)
         {
             img.clear();
-            double increment = (double) maxVal / 43;
+            double increment = (double) maxVal / 36;
             index = (int) (currVal / increment);
-            if (index > 42) {index = 42;}
+            if (index > 36) {index = 0;}
             chargeBarFrames[index].scale(width, height);
             img.drawImage(chargeBarFrames[index], 0, 0);
             setImage(img);
@@ -373,9 +363,9 @@ public class StatBar extends Actor
         if (isChargeBar)
         {
             img.clear();
-            double increment = (double) maxVal / 43;
+            double increment = (double) maxVal / 36;
             index = (int) (currVal / increment);
-            if (index > 42) {index = 42;}
+            if (index > 36) {index = 0;}
             chargeBarFrames[index].scale(width, height);
             img.drawImage(chargeBarFrames[index], 0, 0);
             setImage(img);
@@ -463,4 +453,5 @@ public class StatBar extends Actor
         if (!isChargeBar) {return;}
         usingAbility = true;
     }
+    
 }
