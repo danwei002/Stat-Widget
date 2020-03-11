@@ -8,8 +8,10 @@ import java.lang.Math;
  */
 public class StatBar extends Actor
 {
+    // Constants (used for ratios)
     private static final int baseChargeValue = 50;
     private static final int baseHealthValue = 100;
+    
     // Instance variables
     private boolean isChargeBar;
     
@@ -282,6 +284,8 @@ public class StatBar extends Actor
         
         // keep
         soundCheck();
+        
+        // Animate changes in the health bar's values
         if (currVal < updtVal)
         {
             updtVal -= (int) ((double) maxVal / baseHealthValue + 0.5);
@@ -291,6 +295,7 @@ public class StatBar extends Actor
             updtVal += (int) ((double) maxVal / baseHealthValue + 0.5);
         }
         
+        // Edge case handling (if the difference between the update value and current value is very small)
         if (Math.abs(updtVal - currVal) < (int) ((double) maxVal / baseHealthValue + 0.5))
         {
             currVal = updtVal;
@@ -304,24 +309,26 @@ public class StatBar extends Actor
      */
     public void update(int newVal)
     {
-        if (newVal > maxVal) {newVal = maxVal;}
-        if (newVal < 0) {return;}
-        currVal = newVal;
-        if (isChargeBar)
+        if (newVal > maxVal) {newVal = maxVal;} // protect values (cannot exceed max)
+        if (newVal < 0) {return;} // protect values (cannot have negative values)
+        currVal = newVal; // update value
+        if (isChargeBar) // ability charge bar update handler
         {
             img.clear();
-            double increment = (double) maxVal / 36;
-            index = (int) (currVal / increment);
-            if (index > 36) {index = 0;}
-            chargeBarFrames[index].scale(width, height);
-            img.drawImage(chargeBarFrames[index], 0, 0);
+            double increment = (double) maxVal / 36; // 36 ticks in the bar to fill, each tick is worth "increment" amount of charge
+            index = (int) (currVal / increment); // Get the corresponding index for the bar's image
+            if (index > 36) {index = 0;} // Prevent index out of bounds exception
+            chargeBarFrames[index].scale(width, height); // scale the image to be the width and height of the bar
+            img.drawImage(chargeBarFrames[index], 0, 0); // draw the image
             setImage(img);
         }
-        else 
+        else // health bar update handler
         {
-            int filledWidth = (width - 2 * borderWidth) * newVal / maxVal;
-            int updatingWidth = (width - 2 * borderWidth) * updtVal / maxVal;
-            int emptyWidth = (width - 2 * borderWidth) - updatingWidth;
+            int filledWidth = (width - 2 * borderWidth) * newVal / maxVal; // width of the "filled in" section of the bar
+            int updatingWidth = (width - 2 * borderWidth) * updtVal / maxVal; // width of the section to be updated
+            int emptyWidth = (width - 2 * borderWidth) - updatingWidth; // width of the "empty" section of the bar
+            
+            // If statements for updating down or updating up values
             if(newVal < updtVal)
             {
                 img.setColor(updateDownColor);
@@ -356,11 +363,11 @@ public class StatBar extends Actor
      */
     public void update(int newVal, int newMax)
     {
-        if (newVal < 0 || newMax < 0) {return;}
-        maxVal = newMax;
-        if (newVal > maxVal) {newVal = maxVal;}
-        currVal = newVal;
-        if (isChargeBar)
+        if (newVal < 0 || newMax < 0) {return;} // Both parameters must not be negative
+        maxVal = newMax; // Set max to the specified max to be updated to
+        if (newVal > maxVal) {newVal = maxVal;} // Cannot exceed the max value
+        currVal = newVal; // Update current value
+        if (isChargeBar) // ability charge bar update handler
         {
             img.clear();
             double increment = (double) maxVal / 36;
@@ -370,7 +377,7 @@ public class StatBar extends Actor
             img.drawImage(chargeBarFrames[index], 0, 0);
             setImage(img);
         }
-        else
+        else // health bar update handler
         {
             int filledWidth = (width - 2 * borderWidth) * newVal / maxVal;
             int updatingWidth = (width - 2 * borderWidth) * updtVal / maxVal;
@@ -411,28 +418,29 @@ public class StatBar extends Actor
     {
         if (isChargeBar)
         {
+            // Attempt to play the fully charged sound if the current value is at the maximum (full charge)
             if (currVal == maxVal)
             {
-                if (playedUltSound) {return;}
+                if (playedUltSound) {return;} // Don't play the sound again if it has played already
                 ultCharged.play();
                 playedUltSound = true;
             }
-            else if (currVal < maxVal)
+            else if (currVal < maxVal) // Reset boolean once the current value drops below the maximum
             {
                 playedUltSound = false;
             }
         }
         else
         {
-            if (currVal * 10 <= maxVal * 3)
+            if (currVal * 10 <= maxVal * 3) // for healthbars, low HP warning noise plays when the current value is <=30% of the maximum value
             {
-                if (!playingLowHPSound)
+                if (!playingLowHPSound) // Begin the loop if the sound was not already playing
                 {
                     lowHPSound.playLoop();
                     playingLowHPSound = true;
                 }
             }
-            else 
+            else // stop the sound once the current value is >30% of the maximum value
             {
                 lowHPSound.stop();
                 playingLowHPSound = false;
@@ -448,10 +456,10 @@ public class StatBar extends Actor
      */
     public void useAbility()
     {
-        if (usingAbility) {return;}
-        if (currVal < maxVal) {return;}
-        if (!isChargeBar) {return;}
-        usingAbility = true;
+        if (usingAbility) {return;} // Can't use an ability while already using said ability
+        if (currVal < maxVal) {return;} // Can't use an ability if it is not fully charged
+        if (!isChargeBar) {return;} // Healthbar's do not correspond to abilities
+        usingAbility = true; // Flag the bar as "using ability" to trigger animation
     }
     
 }
