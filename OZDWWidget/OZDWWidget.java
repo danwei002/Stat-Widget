@@ -56,6 +56,7 @@ public class OZDWWidget extends Actor
     private Color borderColor;
     private Color updateUpColor;
     private Color updateDownColor;
+    private Color txtColor;
     
     // Bar dimensions
     private int width;
@@ -72,6 +73,7 @@ public class OZDWWidget extends Actor
     
     // Canvas
     private GreenfootImage img;
+    private GreenfootImage textImg;
     
     /**
      * Creates a generic OZDWWidget with default dimensions and values.
@@ -95,6 +97,7 @@ public class OZDWWidget extends Actor
         borderColor = Color.BLACK;
         updateDownColor = Color.RED;
         updateUpColor = new Color(200, 255, 200);
+        txtColor = Color.BLACK;
         
         img.setColor(Color.BLACK);
         img.fillRect(0, diameter / 4, width, height);
@@ -146,6 +149,7 @@ public class OZDWWidget extends Actor
         borderColor = Color.BLACK;
         updateDownColor = Color.RED;
         updateUpColor = new Color(200, 255, 200);
+        txtColor = Color.BLACK;
         
         img.setColor(borderColor);
         img.fillRect(0, diameter / 4, width, height);
@@ -178,8 +182,9 @@ public class OZDWWidget extends Actor
      * @param borderColor Colour for the border surrounding the rectangular bar.
      * @param updateDownColor Colour for the value update animation for decreases in the rectangular bar's value.
      * @param updateUpColor Colour for the value update animation for increases in the rectangular bar's value
+     * @param txtColor Colour for the rectangular bar's text display.
      */
-    public OZDWWidget(int width, int height, int borderWidth, int hpVal, int maxHpVal, int chargeVal, int maxChargeVal, Color filledColor, Color emptyColor, Color borderColor, Color updateDownColor, Color updateUpColor)
+    public OZDWWidget(int width, int height, int borderWidth, int hpVal, int maxHpVal, int chargeVal, int maxChargeVal, Color filledColor, Color emptyColor, Color borderColor, Color updateDownColor, Color updateUpColor, Color txtColor)
     {
         this.maxHpVal = maxHpVal;
         this.hpVal = hpVal;
@@ -206,6 +211,7 @@ public class OZDWWidget extends Actor
         this.borderColor = borderColor;
         this.updateDownColor = updateDownColor;
         this.updateUpColor = updateUpColor;
+        this.txtColor = txtColor;
         
         img.setColor(borderColor);
         img.fillRect(0, diameter / 4, width, height);
@@ -307,8 +313,12 @@ public class OZDWWidget extends Actor
             if (newVal < 0) {return;} // protect values (cannot have negative values)
             chargeVal = newVal; // update value
         }
-        
+        if (hpVal < 0) {hpVal = 0;}
+        textImg = new GreenfootImage(hpVal + " / " + maxHpVal, 20, txtColor, Color.WHITE);
+        textImg.scale(width / 4, height / 2);
+
         img.clear();
+        img.drawImage(textImg, 0, 0);
         img.setColor(borderColor);
         img.fillRect(0, diameter / 4, width, height);
         
@@ -375,8 +385,11 @@ public class OZDWWidget extends Actor
             if (newVal > maxChargeVal) {newVal = maxChargeVal;}
             chargeVal = newVal;
         }
-        
+        if (hpVal < 0) {hpVal = 0;}
+        textImg = new GreenfootImage(hpVal + " / " + maxHpVal, 20, txtColor, Color.WHITE);
+        textImg.scale(width / 4, height / 2);
         img.clear();
+        img.drawImage(textImg, 0, 0);
         img.setColor(borderColor);
         img.fillRect(0, diameter / 4, width, height);
         

@@ -17,7 +17,7 @@ public class MyWorld extends World
     {    
         // Create a new world with 600x400 cells with a cell size of 1x1 pixels.
         super(1200, 800, 1); 
-        OZDWWidget stat = new OZDWWidget(1000, 100, 10, 500, 1000, 100, 100);
+        OZDWWidget stat = new OZDWWidget(300, 60, 10, 500, 1000, 100, 100, Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.BLUE, Color.PINK);
         addObject(stat, getWidth() / 2, getHeight() / 2);
     }
 }
