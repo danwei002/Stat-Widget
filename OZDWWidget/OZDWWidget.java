@@ -1,19 +1,20 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 import java.lang.Math;
 /**
- * StarBar is a Greenfoot Actor that displays values, such as health of a character of charge of an ability.
+ * OZDWWidget is a Greenfoot Actor that displays values, such as health of a character of charge of an ability. It is essentially
+ * a stat bar.
  * 
- * There are two types of StatBar. One is a circular bar that displays a percentage value in the middle as well as
+ * There are two types of OZDWWidget. One is a circular bar that displays a percentage value in the middle as well as
  * some ticks to represent the percentage. The other is a rectangular bar that can is intended to be used as an HP/shield
  * bar, but can be used for other purposes if desired. 
  * 
- * @author (your name) 
- * @version (a version number or a date)
+ * @author Daniel Wei & Owen Zhu
+ * @version March 11, 2020
  */
-public class test extends Actor
+public class OZDWWidget extends Actor
 {
     // Constants (used for ratios)
-    private static final int baseChargeValue = 50;
+    private static final int baseChargeValue = 100;
     private static final int baseHealthValue = 100;
     private static final int offset = 20;
 
@@ -35,12 +36,13 @@ public class test extends Actor
     // Track if the low HP warning noise is currently playing
     private boolean playingLowHPSound;
     
+    // Track if sound is ALLOWED to be played (enabled by default)
+    private boolean soundEnabled = true;
+    
+    
     // Boolean to track if the ability is currently being used
     private boolean usingAbility;
-    
-    // Check if the ability bar is glowing
-    private boolean isGlowing;
-    
+
     // Track values
     private int hpVal;
     private int maxHpVal;
@@ -63,25 +65,18 @@ public class test extends Actor
     
     // Index for chargeBar array images
     private int index = 0;
-    private int glowIndex = 0;
-    private int animationDelay = 0;
-    
+
     // Sounds
     private GreenfootSound ultCharged = new GreenfootSound("UltimateCharged.mp3");
-    
-    // Source: https://www.youtube.com/watch?v=j0sJ4RoFTug
     private GreenfootSound lowHPSound = new GreenfootSound("LowHealthNoise.mp3");
     
     // Canvas
     private GreenfootImage img;
     
     /**
-     * Creates a generic StatBar, which can either be a rectangular health bar or a circular ability charge bar.
-     * It has a set maximum and set current value.
-     *
-     * @param isChargeBar True if an ability charge bar is wanted, false otherwise.
+     * Creates a generic OZDWWidget with default dimensions and values.
      */
-    public test()
+    public OZDWWidget()
     {
         diameter = 120;
         width = 400;
@@ -114,17 +109,17 @@ public class test extends Actor
     }
     
     /**
-     * Creates a StatBar, which is either a rectangular health bar or a circular ability charge bar, 
-     * of the specified width and height, and with a specified maximum and current value.
+     * Creates an OZDWWidget of the dimensions specified and with the values specified.
      * 
-     * @param isChargeBar True for ability charge bar, false otherwise
-     * @param width Width of the StatBar
-     * @param height Height of the StatBar
-     * @param borderWidth Width of the border of the StatBar. Only applies to rectangular health bars and is ignored by circular ability charge bars.
-     * @param maxHpVal Maximum possible value of the StatBar.
-     * @param hpVal Current value of the StatBar.
+     * @param width Width of the rectangular bar portion of the widget.
+     * @param height Height of the rectangular bar portion of the widget (diameter of the circular bar will be twice this height).
+     * @param borderWidth Width of the border surrounding the rectangular bar portion of the widget.
+     * @param hpVal Initial/starting value for the rectangular bar.
+     * @param maxHpVal Maximum possible value for the rectangular bar.
+     * @param chargeVal Initial/starting value for the circular bar.
+     * @param maxChargeVal Maximum possible value for the circular bar.
      */
-    public test(int width, int height, int borderWidth, int hpVal, int maxHpVal, int chargeVal, int maxChargeVal)
+    public OZDWWidget(int width, int height, int borderWidth, int hpVal, int maxHpVal, int chargeVal, int maxChargeVal)
     {
         this.maxHpVal = maxHpVal;
         this.hpVal = hpVal;
@@ -168,20 +163,23 @@ public class test extends Actor
     }
     
     /**
-     * Creates a rectangular health bar (one of the two types of StatBars).
+     * Creates an OZDWWidget with the dimensions and values specified. Colors are also specified but only apply to the
+     * rectangular bar portion.
      * 
-     * @param width Width of the StatBar
-     * @param height Height of the StatBar
-     * @param borderWidth Width of the border of the StatBar. 
-     * @param maxHpVal Maximum possible value of the StatBar.
-     * @param hpVal Current value of the StatBar.
-     * @param filledColor Colour of the filled up portion of a rectangular health bar.
-     * @param emptyColor Colour of the empty portion of a rectangular health bar.
-     * @param borderColor Colour of the border of a rectangular health bar.
-     * @param updateDownColor Colour of the animation for health loss.
-     * @param udateUpColor Colour of the animation for health gain.
+     * @param width Width of the rectangular bar portion of the widget.
+     * @param height Height of the rectangular bar portion of the widget (diameter of the circular bar will be twice this height).
+     * @param borderWidth Width of the border surrounding the rectangular bar portion of the widget.
+     * @param hpVal Initial/starting value for the rectangular bar.
+     * @param maxHpVal Maximum possible value for the rectangular bar.
+     * @param chargeVal Initial/starting value for the circular bar.
+     * @param maxChargeVal Maximum possible value for the circular bar.
+     * @param filledColor Colour for the filled up portion of the rectangular bar.
+     * @param emptyColor Colour for the empty portion of the rectangular bar.
+     * @param borderColor Colour for the border surrounding the rectangular bar.
+     * @param updateDownColor Colour for the value update animation for decreases in the rectangular bar's value.
+     * @param updateUpColor Colour for the value update animation for increases in the rectangular bar's value
      */
-    public test(int width, int height, int borderWidth, int hpVal, int maxHpVal, int chargeVal, int maxChargeVal, Color filledColor, Color emptyColor, Color borderColor, Color updateDownColor, Color updateUpColor)
+    public OZDWWidget(int width, int height, int borderWidth, int hpVal, int maxHpVal, int chargeVal, int maxChargeVal, Color filledColor, Color emptyColor, Color borderColor, Color updateDownColor, Color updateUpColor)
     {
         this.maxHpVal = maxHpVal;
         this.hpVal = hpVal;
@@ -226,13 +224,14 @@ public class test extends Actor
     }
     
     /**
-     * Act - do whatever the StatBar wants to do. This method is called whenever
+     * Act - do whatever the OZDWWidget wants to do. This method is called whenever
      * the 'Act' or 'Run' button gets pressed in the environment.
      */
     public void act() 
     {
         update(true, hpVal);
         if (Greenfoot.isKeyDown("Q")) {useAbility();}
+        if (Greenfoot.isKeyDown("G")) {toggleSound();}
         if (Greenfoot.isKeyDown("E")) {update(true, maxHpVal / 2);}
         if (Greenfoot.isKeyDown("F")) {update(false, maxChargeVal / 2);}
 
@@ -253,9 +252,19 @@ public class test extends Actor
         {
             chargeVal++;
         }
-
-        //update(true, hpVal);
-        //update(false, chargeVal);
+        
+        if (usingAbility) 
+        {
+            if (chargeVal <= 0)
+            {
+                usingAbility = false;
+                chargeVal = 0;
+            }
+            else
+            {
+                chargeVal -= 2 * (int) ((double) (maxChargeVal / baseChargeValue + 0.5));
+            }
+        }
         // keep
         soundCheck();
         
@@ -277,9 +286,10 @@ public class test extends Actor
     }
     
     /**
-     * Updates the StatBar's current value with a new value. Also updates the appearance of the StatBar accordingly.
+     * Updates the OZDWWidget's current value with a new value. Also updates the appearance of the OZDWWidget accordingly.
      * 
-     * @param newVal New value to update the StatBar with.
+     * @param updatingHp True if the HP (rectangular) bar's values are being updated, false if the ability (circular) bar's values are being updated.
+     * @param newVal New value to update the OZDWWidget with.
      */
     public void update(boolean updatingHp, int newVal)
     {
@@ -341,10 +351,11 @@ public class test extends Actor
     }
     
     /**
-     * Updates the StatBar's current value and current maximum value with new values. Also updates the appearance of the StatBar accordingly.
+     * Updates the OZDWWidget's current value and current maximum value with new values. Also updates the appearance of the OZDWWidget accordingly.
      * 
-     * @param newVal New value to update the StatBar with.
-     * @param newMax New maximum value to update the StatBar with.
+     * @param updatingHp True if the HP (rectangular) bar's values are being updated, false if the ability (circular) bar's values are being updated.
+     * @param newVal New value to update the OZDWWidget with.
+     * @param newMax New maximum value to update the OZDWWidget with.
      */
     public void update(boolean updatingHp, int newVal, int newMax)
     {
@@ -409,46 +420,60 @@ public class test extends Actor
      */
     private void soundCheck()
     {
+        if (!soundEnabled) 
+        {
+            playedUltSound = false;
+            playingLowHPSound = false;
+            ultCharged.stop();
+            lowHPSound.stop();
+            return;
+        }
+        
+        // Attempt to play the fully charged sound if the current charge value is at the maximum (full charge)
+        if (chargeVal == maxChargeVal)
+        {
+            if (playedUltSound) {return;} // Don't play the sound again if it has played already
+            ultCharged.play();
+            playedUltSound = true;
+        }
+        else if (chargeVal < maxChargeVal) // Reset boolean once the current value drops below the maximum
+        {
+            playedUltSound = false;
+        }
 
-            // Attempt to play the fully charged sound if the current value is at the maximum (full charge)
-            if (hpVal == maxHpVal)
+        if (hpVal * 10 <= maxHpVal * 3) // low HP warning noise plays when the current HP value is <=30% of the maximum value
+        {
+            if (!playingLowHPSound) // Begin the loop if the sound was not already playing
             {
-                if (playedUltSound) {return;} // Don't play the sound again if it has played already
-                ultCharged.play();
-                playedUltSound = true;
+                lowHPSound.playLoop();
+                playingLowHPSound = true;
             }
-            else if (hpVal < maxHpVal) // Reset boolean once the current value drops below the maximum
-            {
-                playedUltSound = false;
-            }
-
-            if (hpVal * 10 <= maxHpVal * 3) // for healthbars, low HP warning noise plays when the current value is <=30% of the maximum value
-            {
-                if (!playingLowHPSound) // Begin the loop if the sound was not already playing
-                {
-                    lowHPSound.playLoop();
-                    playingLowHPSound = true;
-                }
-            }
-            else // stop the sound once the current value is >30% of the maximum value
-            {
-                lowHPSound.stop();
-                playingLowHPSound = false;
-            }
-
+        }
+        else // stop the sound once the current value is >30% of the maximum value
+        {
+            lowHPSound.stop();
+            playingLowHPSound = false;
+        }
     }
     
     /**
-     * Tells circular ability charge bars that the ability has been used
-     * (essentially flags an ability as used and resets its charge).
-     * Only allows the ability to be used when the current charge is equal
-     * to the bar's maximum charge value. 
+     * Triggers the animation for resetting the ability charge bar.
+     * Essentially the ability is "used".
+     * Only works if the ability is fully charged and is not currently being used.
      */
     public void useAbility()
     {
         if (usingAbility) {return;} // Can't use an ability while already using said ability
-        if (hpVal < maxHpVal) {return;} // Can't use an ability if it is not fully charged
+        if (chargeVal < maxChargeVal) {return;} // Can't use an ability if it is not fully charged
         usingAbility = true; // Flag the bar as "using ability" to trigger animation
     }
     
+    /**
+     * Toggle between sound effects being disabled and enabled.
+     */
+    public void toggleSound()
+    {
+        if (soundEnabled) {soundEnabled = false;}
+        else {soundEnabled = true;}
+    }
 }
