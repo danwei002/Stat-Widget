@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=StatBar
-comment0.text=\r\n\ DESC\r\n\ \r\n\ @author\ (your\ name)\ \r\n\ @version\ (a\ version\ number\ or\ a\ date)\r\n
+comment0.text=\r\n\ StarBar\ is\ a\ Greenfoot\ Actor\ that\ displays\ values,\ such\ as\ health\ of\ a\ character\ of\ charge\ of\ an\ ability.\r\n\ \r\n\ There\ are\ two\ types\ of\ StatBar.\ One\ is\ a\ circular\ bar\ that\ displays\ a\ percentage\ value\ in\ the\ middle\ as\ well\ as\r\n\ some\ ticks\ to\ represent\ the\ percentage.\ The\ other\ is\ a\ rectangular\ bar\ that\ can\ is\ intended\ to\ be\ used\ as\ an\ HP/shield\r\n\ bar,\ but\ can\ be\ used\ for\ other\ purposes\ if\ desired.\ \r\n\ \r\n\ @author\ (your\ name)\ \r\n\ @version\ (a\ version\ number\ or\ a\ date)\r\n
 comment1.params=isChargeBar
 comment1.target=StatBar(boolean)
 comment1.text=\r\n\ Creates\ a\ generic\ StatBar,\ which\ can\ either\ be\ a\ rectangular\ health\ bar\ or\ a\ circular\ ability\ charge\ bar.\r\n\ It\ has\ a\ set\ maximum\ and\ set\ current\ value.\r\n\r\n\ @param\ isChargeBar\ True\ if\ an\ ability\ charge\ bar\ is\ wanted,\ false\ otherwise.\r\n

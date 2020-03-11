@@ -1,13 +1,10 @@
 #Greenfoot project file
-dependency1.from=MyWorld
-dependency1.to=StatBar
-dependency1.type=UsesDependency
 editor.fx.0.height=1056
 editor.fx.0.width=1936
 editor.fx.0.x=-8
 editor.fx.0.y=-8
 height=1056
-package.numDependencies=1
+package.numDependencies=0
 package.numTargets=3
 project.charset=UTF-8
 publish.hasSource=false
