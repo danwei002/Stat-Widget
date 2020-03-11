@@ -199,7 +199,7 @@ public class OZDWWidget extends Actor
         if (index > 36) {index = 36;}
         chargeBarFrames[index].scale(diameter, diameter);
         img.drawImage(chargeBarFrames[index], width + offset * (int) ((double) (width / 200) + 0.5), 0);
-
+        
         playingLowHPSound = false;
         this.filledColor = filledColor;
         this.emptyColor = emptyColor;
@@ -230,11 +230,13 @@ public class OZDWWidget extends Actor
     public void act() 
     {
         update(true, hpVal);
+        update(false, chargeVal);
         if (Greenfoot.isKeyDown("Q")) {useAbility();}
-        if (Greenfoot.isKeyDown("G")) {toggleSound();}
+        if (Greenfoot.isKeyDown("G")) {update(true, hpVal, maxHpVal * 2);}
         if (Greenfoot.isKeyDown("E")) {update(true, maxHpVal / 2);}
         if (Greenfoot.isKeyDown("F")) {update(false, maxChargeVal / 2);}
-
+        
+        
         if (Greenfoot.isKeyDown("A") && hpVal > 0)
         {
             hpVal--;
@@ -324,14 +326,14 @@ public class OZDWWidget extends Actor
              int filledWidth = (width - 2 * borderWidth) * hpVal / maxHpVal; // width of the "filled in" section of the bar
              int updatingWidth = (width - 2 * borderWidth) * updtVal / maxHpVal; // width of the section to be updated
              int emptyWidth = (width - 2 * borderWidth) - updatingWidth;
-            img.setColor(updateDownColor);
-            img.fillRect(borderWidth, borderWidth + diameter / 4, updatingWidth, height - 2 * borderWidth);
+             img.setColor(updateDownColor);
+             img.fillRect(borderWidth, borderWidth + diameter / 4, updatingWidth, height - 2 * borderWidth);
             
-            img.setColor(filledColor);
-            img.fillRect(borderWidth, borderWidth + diameter / 4, filledWidth, height - 2 * borderWidth);
+             img.setColor(filledColor);
+             img.fillRect(borderWidth, borderWidth + diameter / 4, filledWidth, height - 2 * borderWidth);
             
-            img.setColor(emptyColor);
-            img.fillRect(borderWidth + updatingWidth, borderWidth + diameter / 4, emptyWidth, height - 2 * borderWidth);
+             img.setColor(emptyColor);
+             img.fillRect(borderWidth + updatingWidth, borderWidth + diameter / 4, emptyWidth, height - 2 * borderWidth);
         }
         else
         {
@@ -384,13 +386,12 @@ public class OZDWWidget extends Actor
         chargeBarFrames[index].scale(diameter, diameter); 
         img.drawImage(chargeBarFrames[index], width + offset * (int) ((double) (width / 200) + 0.5), 0); // draw the image
         
-        int filledWidth = (width - 2 * borderWidth) * hpVal / maxHpVal; // width of the "filled in" section of the bar
-        int updatingWidth = (width - 2 * borderWidth) * updtVal / maxHpVal; // width of the section to be updated
-        int emptyWidth = (width - 2 * borderWidth) - updatingWidth; // width of the "empty" section of the bar
-        
         // If statements for updating down or updating up values
         if(newVal < updtVal)
         {
+            int filledWidth = (width - 2 * borderWidth) * hpVal / maxHpVal; // width of the "filled in" section of the bar
+            int updatingWidth = (width - 2 * borderWidth) * updtVal / maxHpVal; // width of the section to be updated
+            int emptyWidth = (width - 2 * borderWidth) - updatingWidth;
             img.setColor(updateDownColor);
             img.fillRect(borderWidth, borderWidth + diameter / 4, updatingWidth, height - 2 * borderWidth);
             
@@ -402,6 +403,9 @@ public class OZDWWidget extends Actor
         }
         else
         {
+            int filledWidth = (width - 2 * borderWidth) * hpVal / maxHpVal; // width of the "filled in" section of the bar
+            int updatingWidth = (width - 2 * borderWidth) * updtVal / maxHpVal; // width of the section to be updated
+            int emptyWidth = (width - 2 * borderWidth) - filledWidth; // width of the "empty" section of the bar
             img.setColor(updateUpColor);
             img.fillRect(borderWidth, borderWidth + diameter / 4, filledWidth, height - 2 * borderWidth);
             
@@ -420,15 +424,6 @@ public class OZDWWidget extends Actor
      */
     private void soundCheck()
     {
-        if (!soundEnabled) 
-        {
-            playedUltSound = false;
-            playingLowHPSound = false;
-            ultCharged.stop();
-            lowHPSound.stop();
-            return;
-        }
-        
         // Attempt to play the fully charged sound if the current charge value is at the maximum (full charge)
         if (chargeVal == maxChargeVal)
         {
@@ -466,14 +461,5 @@ public class OZDWWidget extends Actor
         if (usingAbility) {return;} // Can't use an ability while already using said ability
         if (chargeVal < maxChargeVal) {return;} // Can't use an ability if it is not fully charged
         usingAbility = true; // Flag the bar as "using ability" to trigger animation
-    }
-    
-    /**
-     * Toggle between sound effects being disabled and enabled.
-     */
-    public void toggleSound()
-    {
-        if (soundEnabled) {soundEnabled = false;}
-        else {soundEnabled = true;}
     }
 }
