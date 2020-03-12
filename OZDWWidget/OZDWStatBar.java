@@ -1,17 +1,24 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 import java.lang.Math;
 /**
- * OZDWWidget is a Greenfoot Actor that displays values, such as health of a character of charge of an ability. It is essentially
- * a stat bar.
+ * OZDWStatBar is a Greenfoot actor that displays a pair of stat bars with their individual features.
+ * The first stat bar is a rectangular bar that is intended to be used as an HP/Shield bar, but
+ * it can be used for other applicable uses. The other is a circular bar that displays a 
+ * percentage value in the middle as well as some ticks to provide a visual representation
+ * of the percentage. It is intended to be an ability charge bar, but can also be used for
+ * other purposes. The two bars have their own separate values.
+ * <p>
+ * The purpose of this class is to provide a well integrated statistical bar that can help
+ * provide visuals for their abilities and any type of numerical bar that is required. This
+ * can provide a programmer easy access to a stats bar that is typically used in a RPG game.
+ * <p>
+ * This class contains accessor (getter) and setter (update) methods.
  * 
- * There are two types of OZDWWidget. One is a circular bar that displays a percentage value in the middle as well as
- * some ticks to represent the percentage. The other is a rectangular bar that can is intended to be used as an HP/shield
- * bar, but can be used for other purposes if desired. 
  * 
  * @author Daniel Wei & Owen Zhu
  * @version March 11, 2020
  */
-public class OZDWWidget extends Actor
+public class OZDWStatBar extends Actor
 {
     // Constants (used for ratios)
     private static final int baseChargeValue = 100;
@@ -66,9 +73,6 @@ public class OZDWWidget extends Actor
     
     private boolean updtOverflow = false;
     
-    // Boolean to track if the ability is currently being used
-    private boolean usingAbility;
-
     // Track values
     private int hpVal;
     private int maxHpVal;
@@ -108,9 +112,9 @@ public class OZDWWidget extends Actor
     private GreenfootImage textImg;
     
     /**
-     * Creates a generic OZDWWidget with default dimensions and values.
+     * Creates a generic OZDWStatBar with default dimensions and values.
      */
-    public OZDWWidget()
+    public OZDWStatBar()
     {
         diameter = 120;
         width = 400;
@@ -144,17 +148,17 @@ public class OZDWWidget extends Actor
     }
     
     /**
-     * Creates an OZDWWidget of the dimensions specified and with the values specified.
+     * Creates an OZDWStatBar of the dimensions specified and with the values specified. All values must not be negative.
      * 
-     * @param width Width of the rectangular bar portion of the widget.
-     * @param height Height of the rectangular bar portion of the widget (diameter of the circular bar will be twice this height).
-     * @param borderWidth Width of the border surrounding the rectangular bar portion of the widget.
+     * @param width Width of the rectangular bar portion of the stat bar.
+     * @param height Height of the rectangular bar portion of the stat bar (diameter of the circular bar will be twice this height).
+     * @param borderWidth Width of the border surrounding the rectangular bar portion of the stat bar.
      * @param hpVal Initial/starting value for the rectangular bar.
      * @param maxHpVal Maximum possible value for the rectangular bar.
      * @param chargeVal Initial/starting value for the circular bar.
      * @param maxChargeVal Maximum possible value for the circular bar.
      */
-    public OZDWWidget(int width, int height, int borderWidth, int hpVal, int maxHpVal, int chargeVal, int maxChargeVal)
+    public OZDWStatBar(int width, int height, int borderWidth, int hpVal, int maxHpVal, int chargeVal, int maxChargeVal)
     {
         this.maxHpVal = maxHpVal;
         this.hpVal = hpVal;
@@ -199,12 +203,12 @@ public class OZDWWidget extends Actor
     }
     
     /**
-     * Creates an OZDWWidget with the dimensions and values specified. Colors are also specified but only apply to the
-     * rectangular bar portion.
+     * Creates an OZDWStatBar with the dimensions and values specified. All values must not be negative.
+     * Colors are also specified but only apply to the rectangular bar portion.
      * 
-     * @param width Width of the rectangular bar portion of the widget.
-     * @param height Height of the rectangular bar portion of the widget (diameter of the circular bar will be twice this height).
-     * @param borderWidth Width of the border surrounding the rectangular bar portion of the widget.
+     * @param width Width of the rectangular bar portion of the stat bar.
+     * @param height Height of the rectangular bar portion of the stat bar (diameter of the circular bar will be twice this height).
+     * @param borderWidth Width of the border surrounding the rectangular bar portion of the stat bar.
      * @param hpVal Initial/starting value for the rectangular bar.
      * @param maxHpVal Maximum possible value for the rectangular bar.
      * @param chargeVal Initial/starting value for the circular bar.
@@ -216,7 +220,7 @@ public class OZDWWidget extends Actor
      * @param updateUpColor Colour for the value update animation for increases in the rectangular bar's value
      * @param txtColor Colour for the rectangular bar's text display.
      */
-    public OZDWWidget(int width, int height, int borderWidth, int hpVal, int maxHpVal, int chargeVal, int maxChargeVal, Color filledColor, Color emptyColor, Color borderColor, Color updateDownColor, Color updateUpColor, Color txtColor)
+    public OZDWStatBar(int width, int height, int borderWidth, int hpVal, int maxHpVal, int chargeVal, int maxChargeVal, Color filledColor, Color emptyColor, Color borderColor, Color updateDownColor, Color updateUpColor, Color txtColor)
     {
         this.maxHpVal = maxHpVal;
         this.hpVal = hpVal;
@@ -262,49 +266,11 @@ public class OZDWWidget extends Actor
     }
     
     /**
-     * Act - do whatever the OZDWWidget wants to do. This method is called whenever
+     * Act - do whatever the OZDWStatBar wants to do. This method is called whenever
      * the 'Act' or 'Run' button gets pressed in the environment.
      */
     public void act() 
     {
-        update(true, hpVal);
-        update(false, chargeVal);
-        if (Greenfoot.isKeyDown("Q")) {useAbility();}
-        if (Greenfoot.isKeyDown("G")) {update(true, hpVal, maxHpVal * 2);}
-        if (Greenfoot.isKeyDown("E")) {update(true, maxHpVal / 2);}
-        if (Greenfoot.isKeyDown("F")) {update(false, maxChargeVal / 2);}
-        
-        
-        if (Greenfoot.isKeyDown("A") && hpVal > 0)
-        {
-            hpVal--;
-        }
-        else if (Greenfoot.isKeyDown("D") && hpVal < maxHpVal)
-        {
-            hpVal++;
-        }
-            
-        if (Greenfoot.isKeyDown("A") && chargeVal > 0)
-        {
-            chargeVal--;
-        }
-        else if (Greenfoot.isKeyDown("D") && chargeVal < maxChargeVal)
-        {
-            chargeVal++;
-        }
-        
-        if (usingAbility) 
-        {
-            if (chargeVal <= 0)
-            {
-                usingAbility = false;
-                chargeVal = 0;
-            }
-            else
-            {
-                chargeVal -= 2 * (int) ((double) (maxChargeVal / baseChargeValue + 0.5));
-            }
-        }
         // keep
         soundCheck();
         
@@ -328,29 +294,35 @@ public class OZDWWidget extends Actor
     }
     
     /**
-     * Updates the OZDWWidget's current value with a new value. Also updates the appearance of the OZDWWidget accordingly.
+     * Updates the OZDWStatBar's current value with a new value. Also updates the appearance of the OZDWStatBar accordingly.
      * 
      * @param updatingHp True if the HP (rectangular) bar's values are being updated, false if the ability (circular) bar's values are being updated.
-     * @param newVal New value to update the OZDWWidget with.
+     * @param newVal New value to update the OZDWStatBar with.
      */
     public void update(boolean updatingHp, int newVal)
     {
-        if (updatingHp)
+        if (updatingHp) // if updating the hp value
         {
             if (newVal > maxHpVal) {newVal = maxHpVal;} // protect values (cannot exceed max)
             if (newVal < 0) {return;} // protect values (cannot have negative values)
             hpVal = newVal; // update value
         }
-        else
+        else // if updating the charge value
         {
             if (newVal > maxChargeVal) {newVal = maxChargeVal;} // protect values (cannot exceed max)
             if (newVal < 0) {return;} // protect values (cannot have negative values)
             chargeVal = newVal; // update value
         }
+        
+        // Additional negative value protection
         if (hpVal < 0) {hpVal = 0;}
+        if (chargeVal < 0) {chargeVal = 0;}
+        
+        // Text display for rectangular bar
         textImg = new GreenfootImage(hpVal + " / " + maxHpVal, 20, txtColor, Color.WHITE);
         textImg.scale(width / 4, height / 2);
-
+        
+        // Drawing onto canvas
         img.clear();
         img.drawImage(textImg, 0, 0);
         img.setColor(borderColor);
@@ -362,10 +334,11 @@ public class OZDWWidget extends Actor
         chargeBarFrames[index].scale(diameter, diameter); 
         img.drawImage(chargeBarFrames[index], width + offset * (int) ((double) (width / 200) + 0.5), 0); // draw the image
         
+        // Animation driver code
         if (chargeVal == maxChargeVal)
         {
-            fullChargeIndex += animDelay / 3;
-            if (animDelay == 3) {animDelay = 0;}
+            fullChargeIndex += animDelay / 5;
+            if (animDelay == 5) {animDelay = 0;}
             else {animDelay++;}
             if (fullChargeIndex > 90) {fullChargeIndex = 0;}
         }
@@ -375,7 +348,7 @@ public class OZDWWidget extends Actor
         }
         fullChargeFrames[fullChargeIndex].scale(diameter, diameter);
         img.drawImage(fullChargeFrames[fullChargeIndex], width + offset * (int) ((double) (width / 200) + 0.5), 0);
-        
+
         // If statements for updating down or updating up values
         if(hpVal < updtVal)
         {
@@ -409,11 +382,11 @@ public class OZDWWidget extends Actor
     }
     
     /**
-     * Updates the OZDWWidget's current value and current maximum value with new values. Also updates the appearance of the OZDWWidget accordingly.
+     * Updates the OZDWStatBar's current value and current maximum value with new values. Also updates the appearance of the OZDWStatBar accordingly.
      * 
      * @param updatingHp True if the HP (rectangular) bar's values are being updated, false if the ability (circular) bar's values are being updated.
-     * @param newVal New value to update the OZDWWidget with.
-     * @param newMax New maximum value to update the OZDWWidget with.
+     * @param newVal New value to update the OZDWStatBar with.
+     * @param newMax New maximum value to update the OZDWStatBar with.
      */
     public void update(boolean updatingHp, int newVal, int newMax)
     {
@@ -431,7 +404,12 @@ public class OZDWWidget extends Actor
             if (newVal > maxChargeVal) {newVal = maxChargeVal;}
             chargeVal = newVal;
         }
+        
+        // More negative value protection
         if (hpVal < 0) {hpVal = 0;}
+        if (chargeVal < 0) {chargeVal = 0;}
+        
+        // Drawing onto the canvas
         textImg = new GreenfootImage(hpVal + " / " + maxHpVal, 20, txtColor, Color.WHITE);
         textImg.scale(width / 4, height / 2);
         img.clear();
@@ -439,11 +417,27 @@ public class OZDWWidget extends Actor
         img.setColor(borderColor);
         img.fillRect(0, diameter / 4, width, height);
         
+        // Draw correct frame for ability bar
         double increment = (double) maxChargeVal / 36; // 36 ticks in the bar to fill, each tick is worth "increment" amount of charge
         index = (int) (chargeVal / increment); // Get the corresponding index for the bar's image
         if (index == 37) {index = 0;} // Prevent index out of bounds exception
         chargeBarFrames[index].scale(diameter, diameter); 
         img.drawImage(chargeBarFrames[index], width + offset * (int) ((double) (width / 200) + 0.5), 0); // draw the image
+        
+        // Animation driver code
+        if (chargeVal == maxChargeVal)
+        {
+            fullChargeIndex += animDelay / 5;
+            if (animDelay == 5) {animDelay = 0;}
+            else {animDelay++;}
+            if (fullChargeIndex > 90) {fullChargeIndex = 0;}
+        }
+        else
+        {
+            fullChargeIndex = 0;
+        }
+        fullChargeFrames[fullChargeIndex].scale(diameter, diameter);
+        img.drawImage(fullChargeFrames[fullChargeIndex], width + offset * (int) ((double) (width / 200) + 0.5), 0);
         
         // If statements for updating down or updating up values
         if(newVal < updtVal)
@@ -511,14 +505,22 @@ public class OZDWWidget extends Actor
     }
     
     /**
-     * Triggers the animation for resetting the ability charge bar.
-     * Essentially the ability is "used".
-     * Only works if the ability is fully charged and is not currently being used.
+     * Gets the maximum charge value for this stat bar.
+     * 
+     * @return int Maximum charge value (maxChargeVal)
      */
-    public void useAbility()
+    public int getMaxChargeValue()
     {
-        if (usingAbility) {return;} // Can't use an ability while already using said ability
-        if (chargeVal < maxChargeVal) {return;} // Can't use an ability if it is not fully charged
-        usingAbility = true; // Flag the bar as "using ability" to trigger animation
+        return maxChargeVal;
+    }
+    
+    /**
+     * Gets the maximum hp value for this stat bar.
+     * 
+     * @return int Maximum HP value (maxHpVal).
+     */
+    public int getMaxHpValue()
+    {
+        return maxHpVal;
     }
 }
