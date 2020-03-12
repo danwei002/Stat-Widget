@@ -17,7 +17,32 @@ public class OZDWWidget extends Actor
     private static final int baseChargeValue = 100;
     private static final int baseHealthValue = 100;
     private static final int offset = 20;
-
+    
+    // Array to keep track of the animation for a fully charged ability bar
+    GreenfootImage[] fullChargeFrames = {new GreenfootImage("fCharge (0).gif"), new GreenfootImage("fCharge (1).gif"), new GreenfootImage("fCharge (2).gif"), new GreenfootImage("fCharge (3).gif"), new GreenfootImage("fCharge (4).gif"),
+                                new GreenfootImage("fCharge (5).gif"), new GreenfootImage("fCharge (6).gif"), new GreenfootImage("fCharge (7).gif"), new GreenfootImage("fCharge (8).gif"), 
+                                new GreenfootImage("fCharge (9).gif"), new GreenfootImage("fCharge (10).gif"), new GreenfootImage("fCharge (11).gif"), new GreenfootImage("fCharge (12).gif"), 
+                                new GreenfootImage("fCharge (13).gif"), new GreenfootImage("fCharge (14).gif"), new GreenfootImage("fCharge (15).gif"), new GreenfootImage("fCharge (16).gif"),
+                                new GreenfootImage("fCharge (17).gif"), new GreenfootImage("fCharge (18).gif"), new GreenfootImage("fCharge (19).gif"), new GreenfootImage("fCharge (20).gif"), 
+                                new GreenfootImage("fCharge (21).gif"), new GreenfootImage("fCharge (22).gif"), new GreenfootImage("fCharge (23).gif"), new GreenfootImage("fCharge (24).gif"),
+                                new GreenfootImage("fCharge (25).gif"), new GreenfootImage("fCharge (26).gif"), new GreenfootImage("fCharge (27).gif"), new GreenfootImage("fCharge (28).gif"),
+                                new GreenfootImage("fCharge (29).gif"), new GreenfootImage("fCharge (30).gif"), new GreenfootImage("fCharge (31).gif"), new GreenfootImage("fCharge (32).gif"),
+                                new GreenfootImage("fCharge (33).gif"), new GreenfootImage("fCharge (34).gif"), new GreenfootImage("fCharge (35).gif"), new GreenfootImage("fCharge (36).gif"),
+                                new GreenfootImage("fCharge (37).gif"), new GreenfootImage("fCharge (38).gif"), new GreenfootImage("fCharge (39).gif"), new GreenfootImage("fCharge (40).gif"),
+                                new GreenfootImage("fCharge (41).gif"), new GreenfootImage("fCharge (42).gif"), new GreenfootImage("fCharge (43).gif"), new GreenfootImage("fCharge (44).gif"),
+                                new GreenfootImage("fCharge (45).gif"), new GreenfootImage("fCharge (46).gif"), new GreenfootImage("fCharge (47).gif"), new GreenfootImage("fCharge (48).gif"),
+                                new GreenfootImage("fCharge (49).gif"), new GreenfootImage("fCharge (50).gif"), new GreenfootImage("fCharge (51).gif"), new GreenfootImage("fCharge (52).gif"), 
+                                new GreenfootImage("fCharge (53).gif"), new GreenfootImage("fCharge (54).gif"), new GreenfootImage("fCharge (55).gif"), new GreenfootImage("fCharge (56).gif"),
+                                new GreenfootImage("fCharge (57).gif"), new GreenfootImage("fCharge (58).gif"), new GreenfootImage("fCharge (59).gif"), new GreenfootImage("fCharge (60).gif"),
+                                new GreenfootImage("fCharge (61).gif"), new GreenfootImage("fCharge (62).gif"), new GreenfootImage("fCharge (63).gif"), new GreenfootImage("fCharge (64).gif"),
+                                new GreenfootImage("fCharge (65).gif"), new GreenfootImage("fCharge (66).gif"), new GreenfootImage("fCharge (67).gif"), new GreenfootImage("fCharge (68).gif"),
+                                new GreenfootImage("fCharge (69).gif"), new GreenfootImage("fCharge (70).gif"), new GreenfootImage("fCharge (71).gif"), new GreenfootImage("fCharge (72).gif"),
+                                new GreenfootImage("fCharge (73).gif"), new GreenfootImage("fCharge (74).gif"), new GreenfootImage("fCharge (75).gif"), new GreenfootImage("fCharge (76).gif"),
+                                new GreenfootImage("fCharge (77).gif"), new GreenfootImage("fCharge (78).gif"), new GreenfootImage("fCharge (79).gif"), new GreenfootImage("fCharge (80).gif"),
+                                new GreenfootImage("fCharge (81).gif"), new GreenfootImage("fCharge (82).gif"), new GreenfootImage("fCharge (83).gif"), new GreenfootImage("fCharge (84).gif"),
+                                new GreenfootImage("fCharge (85).gif"), new GreenfootImage("fCharge (86).gif"), new GreenfootImage("fCharge (87).gif"), new GreenfootImage("fCharge (88).gif"),
+                                new GreenfootImage("fCharge (89).gif"), new GreenfootImage("fCharge (90).gif")};
+                                
     // Array to keep track of the chargeBar states
     private GreenfootImage[] chargeBarFrames = {new GreenfootImage("ultBar0.png"), new GreenfootImage("ultBar1.png"), new GreenfootImage("ultBar2.png"), new GreenfootImage("ultBar3.png"), 
                                              new GreenfootImage("ultBar4.png"), new GreenfootImage("ultBar5.png"), new GreenfootImage("ultBar6.png"), new GreenfootImage("ultBar7.png"),
@@ -39,6 +64,7 @@ public class OZDWWidget extends Actor
     // Track if sound is ALLOWED to be played (enabled by default)
     private boolean soundEnabled = true;
     
+    private boolean updtOverflow = false;
     
     // Boolean to track if the ability is currently being used
     private boolean usingAbility;
@@ -66,6 +92,12 @@ public class OZDWWidget extends Actor
     
     // Index for chargeBar array images
     private int index = 0;
+    
+    // Index for ability animation
+    private int fullChargeIndex = 0;
+    
+    // Animation delay
+    private int animDelay = 0;
 
     // Sounds
     private GreenfootSound ultCharged = new GreenfootSound("UltimateCharged.mp3");
@@ -279,17 +311,19 @@ public class OZDWWidget extends Actor
         // Animate changes in the health bar's values
         if (hpVal < updtVal)
         {
+            updtOverflow = true;
             updtVal -= (int) ((double) maxHpVal / baseHealthValue + 0.5);
         }
         else if (hpVal > updtVal)
         {
+            updtOverflow = false;
             updtVal += (int) ((double) maxHpVal / baseHealthValue + 0.5);
         }
         
         // Edge case handling (if the difference between the update value and current value is very small)
-        if (Math.abs(updtVal - hpVal) < (int) ((double) maxHpVal / baseHealthValue + 0.5))
+        if ((updtOverflow && hpVal > updtVal) || (!updtOverflow && hpVal < updtVal))
         {
-            hpVal = updtVal;
+            updtVal = hpVal;
         }
     }
     
@@ -328,7 +362,19 @@ public class OZDWWidget extends Actor
         chargeBarFrames[index].scale(diameter, diameter); 
         img.drawImage(chargeBarFrames[index], width + offset * (int) ((double) (width / 200) + 0.5), 0); // draw the image
         
-        // width of the "empty" section of the bar
+        if (chargeVal == maxChargeVal)
+        {
+            fullChargeIndex += animDelay / 3;
+            if (animDelay == 3) {animDelay = 0;}
+            else {animDelay++;}
+            if (fullChargeIndex > 90) {fullChargeIndex = 0;}
+        }
+        else
+        {
+            fullChargeIndex = 0;
+        }
+        fullChargeFrames[fullChargeIndex].scale(diameter, diameter);
+        img.drawImage(fullChargeFrames[fullChargeIndex], width + offset * (int) ((double) (width / 200) + 0.5), 0);
         
         // If statements for updating down or updating up values
         if(hpVal < updtVal)
